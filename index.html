@@ -1,0 +1,1058 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Devinette Élite | 0-500</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;500;700;900&display=swap');
+
+        body {
+            font-family: 'Outfit', sans-serif;
+            background-color: #0f172a;
+            color: white;
+            overflow: hidden;
+            cursor: default;
+            height: 100vh; /* Important pour le centrage vertical */
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* --- NOUVELLES ANIMATIONS STYLÉES --- */
+        
+        /* Effet de tremblement pour les erreurs */
+        @keyframes shake-horizontal { 0%, 100% { transform: translateX(0); } 20%, 60% { transform: translateX(-6px); } 40%, 80% { transform: translateX(6px); } }
+        .shake-effect { animation: shake-horizontal 0.4s ease-in-out; border-color: #f43f5e !important; box-shadow: 0 0 20px rgba(244, 63, 94, 0.3) !important; }
+
+        /* Effet "Pop" pour les stats */
+        @keyframes stat-pop-anim { 0% { transform: scale(1); } 50% { transform: scale(1.5); color: #fff; } 100% { transform: scale(1); } }
+        .stat-pop { animation: stat-pop-anim 0.4s cubic-bezier(0.34, 1.56, 0.64, 1); }
+
+        /* Pulsation douce pour l'icône de login */
+        @keyframes pulse-soft { 0%, 100% { transform: scale(1) rotate(6deg); filter: brightness(1); } 50% { transform: scale(1.08) rotate(6deg); filter: brightness(1.2); box-shadow: 0 20px 30px -10px rgba(99, 102, 241, 0.5); } }
+        .login-icon-anim { animation: pulse-soft 3s infinite ease-in-out; }
+
+        /* Apparition en fondu vers le haut */
+        @keyframes fade-up { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        .animate-fade-up { animation: fade-up 0.6s ease-out forwards; opacity: 0; }
+        .delay-100 { animation-delay: 0.1s; } .delay-200 { animation-delay: 0.2s; } .delay-300 { animation-delay: 0.3s; }
+
+        /* --- ARRIÈRE-PLAN & BASE --- */
+        .bg-animation {
+            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: -1;
+            background: radial-gradient(circle at 50% 50%, #1e293b, #000000); overflow: hidden;
+        }
+        .orb { position: absolute; border-radius: 50%; filter: blur(80px); opacity: 0.5; animation: float 20s infinite ease-in-out; }
+        .orb-1 { width: 500px; height: 500px; background: #4f46e5; top: -150px; left: -150px; }
+        .orb-2 { width: 400px; height: 400px; background: #d946ef; bottom: -100px; right: -100px; }
+        @keyframes float { 0%, 100% { transform: translate(0, 0) scale(1); } 33% { transform: translate(30px, -50px) scale(1.1); } 66% { transform: translate(-20px, 20px) scale(0.9); } }
+
+        /* --- NOUNOURS 3D --- */
+        @keyframes breathing { 0%, 100% { transform: translateX(-50%) translateY(0) scale(1); } 50% { transform: translateX(-50%) translateY(-5px) scale(1.02); } }
+        .bear-wrapper {
+            position: absolute; top: -105px; left: 50%; transform: translateX(-50%); width: 140px; height: 120px; z-index: 5;
+            pointer-events: none; transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); animation: breathing 4s infinite ease-in-out;
+        }
+        .bear-head {
+            width: 100px; height: 90px; background: radial-gradient(circle at 35% 35%, #818cf8, #4338ca);
+            border-radius: 55% 55% 45% 45% / 65% 65% 35% 35%; position: absolute; left: 20px; top: 20px;
+            box-shadow: inset 8px 8px 15px rgba(255,255,255,0.15), inset -10px -10px 20px rgba(0,0,0,0.4), 0 15px 30px rgba(0,0,0,0.4);
+            transition: transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1); transform-style: preserve-3d;
+        }
+        .ear { position: absolute; width: 38px; height: 38px; background: radial-gradient(circle at 30% 30%, #6366f1, #312e81); border-radius: 50%; top: -12px; z-index: -1; box-shadow: inset -2px -2px 8px rgba(0,0,0,0.3); }
+        .ear.left { left: -8px; transform: rotate(-15deg); } .ear.right { right: -8px; transform: rotate(15deg); }
+        .ear-inner { position: absolute; width: 22px; height: 22px; background: #a5b4fc; border-radius: 50%; top: 50%; left: 50%; transform: translate(-50%, -50%); opacity: 0.5; }
+        .muzzle { position: absolute; bottom: 12px; left: 50%; transform: translateX(-50%) translateZ(15px); width: 48px; height: 34px; background: #c7d2fe; border-radius: 50%; box-shadow: inset -2px -2px 10px rgba(0,0,0,0.1); }
+        .nose { position: absolute; top: 6px; left: 50%; transform: translateX(-50%); width: 16px; height: 10px; background: #1e1b4b; border-radius: 40%; }
+        .eye-group { position: absolute; top: 32px; width: 100%; display: flex; justify-content: space-between; padding: 0 24px; transform: translateZ(10px); }
+        .eye { width: 15px; height: 18px; background: #0f172a; border-radius: 50%; position: relative; overflow: hidden; box-shadow: 0 2px 4px rgba(0,0,0,0.5); }
+        .pupil { width: 6px; height: 6px; background: white; border-radius: 50%; position: absolute; top: 4px; left: 4px; transition: transform 0.1s ease-out; }
+        @keyframes shake-head { 0%, 100% { transform: rotateY(0deg); } 25% { transform: rotateY(-25deg); } 75% { transform: rotateY(25deg); } }
+        @keyframes nod-down { 0% { transform: rotateX(0); } 40% { transform: rotateX(35deg) translateY(10px); } 100% { transform: rotateX(0); } }
+        @keyframes bounce-joy { 0%, 100% { transform: translateY(0) scale(1); } 50% { transform: translateY(-30px) scale(1.05); } }
+        .bear-anim-no .bear-head { animation: shake-head 0.5s ease-in-out; }
+        .bear-anim-down .bear-head { animation: nod-down 1s cubic-bezier(0.4, 0, 0.2, 1); }
+        .bear-anim-win .bear-head { animation: bounce-joy 0.6s infinite ease-in-out; }
+        .bear-shadow { position: absolute; bottom: -5px; left: 50%; transform: translateX(-50%); width: 80px; height: 15px; background: rgba(0,0,0,0.3); filter: blur(8px); border-radius: 50%; z-index: -2; }
+
+        /* --- UI IMPROVED --- */
+        .glass-panel {
+            background: rgba(15, 23, 42, 0.75); backdrop-filter: blur(25px);
+            border: 1px solid rgba(255, 255, 255, 0.1); box-shadow: 0 30px 70px -20px rgba(0, 0, 0, 0.8);
+            z-index: 10; transform-style: preserve-3d; overflow: hidden;
+        }
+        .glass-panel::before {
+            content: ''; position: absolute; top: 0; left: -50%; width: 100%; height: 100%;
+            background: linear-gradient(to right, transparent, rgba(255,255,255,0.05), transparent);
+            transform: skewX(-25deg); pointer-events: none; animation: shine 6s infinite linear;
+        }
+        @keyframes shine { 0% { left: -100%; } 20% { left: 100%; } 100% { left: 100%; } }
+
+        .btn-3d { transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1); position: relative; box-shadow: 0 6px 0 rgb(55, 48, 163), 0 15px 25px rgba(0,0,0,0.4); }
+        .btn-3d:active { transform: translateY(6px) scale(0.98); box-shadow: 0 0px 0 rgb(55, 48, 163), 0 2px 10px rgba(0,0,0,0.3); }
+        
+        .custom-input { background: rgba(2, 6, 23, 0.5); transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); border: 1px solid rgba(255,255,255,0.1); }
+        /* Focus plus intense */
+        .custom-input:focus { outline: none; border-color: #818cf8; box-shadow: 0 0 35px rgba(99, 102, 241, 0.3); transform: scale(1.03); background: rgba(2, 6, 23, 0.8); }
+
+        @keyframes heart-explode { 50% { transform: scale(1.5); opacity: 0; } 100% { transform: scale(0); opacity: 0; } }
+        .heart-poof { animation: heart-explode 0.5s forwards; }
+        .screen { transition: all 0.7s cubic-bezier(0.68, -0.55, 0.265, 1.55); position: absolute; width: 100%; max-width: 28rem; }
+        .screen-hidden { opacity: 0; pointer-events: none; transform: scale(0.8) translateY(100px) rotateX(-30deg); filter: blur(10px); }
+        .screen-active { opacity: 1; pointer-events: auto; transform: scale(1) translateY(0) rotateX(0); filter: blur(0); }
+        #mouse-glow { width: 500px; height: 500px; background: radial-gradient(circle, rgba(99, 102, 241, 0.12) 0%, rgba(0,0,0,0) 60%); position: fixed; border-radius: 50%; pointer-events: none; z-index: -1; transform: translate(-50%, -50%); transition: all 0.1s ease-out; }
+        .stat-pill { background: rgba(15, 23, 42, 0.8); border: 1px solid rgba(255,255,255,0.1); box-shadow: inset 0 2px 10px rgba(0,0,0,0.2); }
+    </style>
+</head>
+<body class="selection:bg-indigo-500 selection:text-white">
+
+    <div class="bg-animation"><div class="orb orb-1"></div><div class="orb orb-2"></div></div>
+    <div id="mouse-glow"></div>
+    <canvas id="confetti-canvas" class="fixed top-0 left-0 w-full h-full pointer-events-none z-50"></canvas>
+
+    <div class="relative w-full max-w-md h-[600px] flex items-center justify-center z-20">
+
+        <div id="bear-character" class="bear-wrapper opacity-0">
+            <div class="bear-shadow"></div>
+            <div class="bear-head" id="bear-head">
+                <div class="ear left"><div class="ear-inner"></div></div>
+                <div class="ear right"><div class="ear-inner"></div></div>
+                <div class="eye-group">
+                    <div class="eye"><div class="pupil" id="pupil-left"></div></div>
+                    <div class="eye"><div class="pupil" id="pupil-right"></div></div>
+                </div>
+                <div class="muzzle"><div class="nose"></div></div>
+            </div>
+        </div>
+
+        <div id="name-screen" class="screen screen-active glass-panel p-10 rounded-[3rem] mx-4 text-center border-t border-white/20">
+            <div class="mb-8 animate-fade-up">
+                <div class="w-24 h-24 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-3xl mx-auto flex items-center justify-center shadow-2xl login-icon-anim mb-6">
+                    <i class="fas fa-rocket text-5xl text-white drop-shadow-lg"></i>
+                </div>
+                <h1 class="text-5xl font-black mb-2 tracking-tight bg-clip-text text-transparent bg-gradient-to-b from-white to-indigo-200">Salut !</h1>
+                <p class="text-slate-300 font-medium">Entrez votre nom pour jouer</p>
+            </div>
+            
+            <div class="animate-fade-up delay-100">
+                <input type="text" id="user-name-input" 
+                    class="custom-input w-full rounded-2xl py-5 px-6 text-2xl text-center font-bold text-white placeholder-slate-500 mb-8 tracking-wide"
+                    placeholder="Votre pseudo..." autocomplete="off">
+            </div>
+
+            <div class="animate-fade-up delay-200">
+                <button onclick="saveAndPlay()" 
+                    class="btn-3d w-full bg-gradient-to-r from-indigo-600 via-indigo-500 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white font-black py-5 rounded-2xl text-xl uppercase tracking-widest mb-6 shadow-xl">
+                    COMMENCER L'AVENTURE
+                </button>
+            </div>
+            
+            <div class="animate-fade-up delay-300">
+                <p class="text-[10px] text-indigo-300/70 uppercase tracking-[0.2em] font-bold flex items-center justify-center gap-2">
+                    <i class="fas fa-cloud-arrow-up"></i> Sauvegarde auto activée
+                </p>
+            </div>
+        </div>
+
+        <div id="game-screen" class="screen screen-hidden glass-panel p-6 rounded-[3rem] mx-4 pt-10 border-t border-white/20">
+            
+            <div class="flex justify-between items-start mb-4 border-b border-white/5 pb-3">
+                <div>
+                    <div class="flex items-center gap-2 mb-1">
+                        <span class="text-[10px] font-bold text-indigo-400 uppercase tracking-wider">JOUEUR</span>
+                        <button onclick="logout()" class="text-[10px] text-slate-500 hover:text-red-400 underline decoration-dotted cursor-pointer transition-colors">(Déconnexion)</button>
+                    </div>
+                    <h2 id="display-name" class="text-xl font-black text-white truncate max-w-[140px] drop-shadow-sm">...</h2>
+                </div>
+                
+                <div class="stat-pill rounded-2xl p-2 flex gap-4 text-xs font-bold shadow-lg backdrop-blur-md">
+                    <div class="flex flex-col items-center px-2">
+                        <span class="text-green-400"><i class="fas fa-trophy mb-1 text-sm"></i></span>
+                        <span id="stat-wins" class="text-white text-sm transition-transform will-change-transform">0</span>
+                    </div>
+                    <div class="w-px bg-white/10"></div>
+                    <div class="flex flex-col items-center px-2">
+                        <span class="text-rose-400"><i class="fas fa-skull-crossbones mb-1 text-sm"></i></span>
+                        <span id="stat-losses" class="text-white text-sm transition-transform will-change-transform">0</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-gradient-to-r from-indigo-500/10 to-purple-500/10 border border-indigo-500/30 rounded-2xl p-4 mb-5 flex items-center gap-4 shadow-[inset_0_0_20px_rgba(99,102,241,0.1)]">
+                <div class="bg-indigo-500/20 w-10 h-10 rounded-full flex items-center justify-center shrink-0 shadow-sm border border-indigo-500/30">
+                    <i class="fas fa-bullseye text-indigo-300 text-sm"></i>
+                </div>
+                <p class="text-xs text-indigo-100 leading-relaxed font-medium">
+                    <span class="text-white font-black uppercase block text-[10px] tracking-wider mb-1 opacity-70">Objectif Actuel :</span>
+                    Trouver le nombre caché entre <span class="text-white font-bold bg-indigo-500/30 px-1 rounded">0 et 500</span> en moins de <span class="text-white font-bold bg-indigo-500/30 px-1 rounded">7 essais</span>.
+                </p>
+            </div>
+
+            <div class="flex justify-center gap-3 mb-6 p-2 bg-black/20 rounded-2xl" id="lives-container"></div>
+
+            <div class="h-16 flex flex-col items-center justify-center mb-5 relative">
+                 <div class="absolute inset-0 bg-indigo-500/5 blur-xl rounded-full z-0"></div>
+                <p id="message" class="text-lg font-bold text-slate-300 text-center leading-snug z-10 drop-shadow"></p>
+            </div>
+
+            <div class="relative mb-6 group">
+                <input type="number" id="user-guess" 
+                    class="custom-input w-full rounded-2xl py-5 px-6 text-5xl text-center font-black text-white placeholder-slate-600/50 tracking-tight"
+                    placeholder="???" min="0" max="500">
+                    <div class="absolute inset-0 rounded-2xl border-2 border-indigo-500/0 group-hover:border-indigo-500/30 transition-all pointer-events-none"></div>
+            </div>
+
+            <button id="submit-btn" onclick="checkGuess()" 
+                class="btn-3d w-full bg-gradient-to-r from-indigo-600 via-purple-600 to-indigo-600 bg-[length:200%_auto] hover:bg-right transition-all duration-500 text-white font-black py-5 rounded-2xl uppercase tracking-tighter text-2xl shadow-xl shadow-indigo-500/30 relative overflow-hidden">
+                <span class="relative z-10">TENTER MA CHANCE</span>
+            </button>
+
+            <button id="reset-btn" onclick="resetGameLogic()" 
+                class="hidden btn-3d w-full bg-gradient-to-r from-slate-700 to-slate-800 hover:from-slate-600 hover:to-slate-700 text-white font-black py-5 rounded-2xl uppercase text-xl tracking-widest">
+                NOUVELLE PARTIE
+            </button>
+        </div>
+    </div>
+
+    <div class="fixed bottom-6 w-full text-center z-10 pointer-events-none">
+        <p class="text-[10px] text-slate-500 font-black uppercase tracking-[0.4em] opacity-60 hover:opacity-100 transition-opacity duration-300 cursor-default pointer-events-auto inline-block py-2 px-4 rounded-full bg-black/10 backdrop-blur-sm border border-white/5 shadow-sm">
+            by KennyArp
+        </p>
+    </div>
+
+
+    <script>
+        const MAX_ATTEMPTS = 7;
+        const MAX_NUMBER = 500;
+        let playerData = { name: "", wins: 0, losses: 0 };
+
+        window.addEventListener('load', () => {
+            const savedData = localStorage.getItem('guessGameData');
+            if (savedData) {
+                playerData = JSON.parse(savedData);
+                initGameInterface();
+            } else {
+                 // Animation d'entrée si pas de sauvegarde
+                 document.getElementById('user-name-input').focus();
+            }
+        });
+
+        function saveAndPlay() {
+            const inputField = document.getElementById('user-name-input');
+            const inputName = inputField.value.trim();
+            if (!inputName) {
+                // Interaction : Tremblement si vide
+                triggerShake(inputField);
+                return;
+            }
+            playerData.name = inputName;
+            saveData();
+            initGameInterface();
+        }
+
+        function saveData() {
+            localStorage.setItem('guessGameData', JSON.stringify(playerData));
+            updateStatsUI();
+        }
+
+        function logout() {
+            if(confirm("Se déconnecter et effacer les données locales ?")) {
+                localStorage.removeItem('guessGameData');
+                location.reload();
+            }
+        }
+
+        function updateStatsUI() {
+            document.getElementById('display-name').textContent = playerData.name;
+            // Interaction : Pop animation sur les chiffres
+            animateStatUpdate('stat-wins', playerData.wins);
+            animateStatUpdate('stat-losses', playerData.losses);
+        }
+
+        function animateStatUpdate(id, value) {
+            const el = document.getElementById(id);
+            if(el.textContent != value) {
+                el.classList.remove('stat-pop');
+                void el.offsetWidth; // Reflow hack
+                el.textContent = value;
+                el.classList.add('stat-pop');
+            } else {
+                el.textContent = value;
+            }
+        }
+
+        // --- GAME LOGIC ---
+        let targetNumber, attempts, isGameOver;
+        const nameScreen = document.getElementById('name-screen');
+        const gameScreen = document.getElementById('game-screen');
+        const bearCharacter = document.getElementById('bear-character');
+        const messageEl = document.getElementById('message');
+        const guessInput = document.getElementById('user-guess');
+        const submitBtn = document.getElementById('submit-btn');
+        const resetBtn = document.getElementById('reset-btn');
+
+        function initGameInterface() {
+            nameScreen.classList.remove('screen-active');
+            nameScreen.classList.add('screen-hidden');
+            setTimeout(() => {
+                gameScreen.classList.remove('screen-hidden');
+                gameScreen.classList.add('screen-active');
+                bearCharacter.classList.remove('opacity-0');
+                updateStatsUI();
+                resetGameLogic();
+            }, 500);
+        }
+
+        function resetGameLogic() {
+            targetNumber = Math.floor(Math.random() * 501);
+            attempts = 0;
+            isGameOver = false;
+            guessInput.value = '';
+            guessInput.disabled = false;
+            setTimeout(() => guessInput.focus(), 600);
+            
+            messageEl.innerHTML = `À toi de jouer, <span class="text-indigo-400">${playerData.name}</span> !<br><span class="text-xs opacity-50 font-normal">Le nouveau nombre est prêt.</span>`;
+            messageEl.className = "text-xl font-bold text-slate-300 text-center";
+            
+            submitBtn.classList.remove('hidden');
+            resetBtn.classList.add('hidden');
+            bearCharacter.classList.remove('bear-anim-no', 'bear-anim-down', 'bear-anim-win');
+            renderHearts();
+            stopConfetti();
+        }
+
+        function renderHearts(lostIndex = -1) {
+            const container = document.getElementById('lives-container');
+            if (lostIndex === -1) {
+                container.innerHTML = '';
+                for (let i = 0; i < MAX_ATTEMPTS; i++) {
+                    const h = document.createElement('i');
+                    // Style des cœurs plus poussé
+                    h.className = `fas fa-heart text-xl text-rose-500 drop-shadow-[0_2px_10px_rgba(244,63,94,0.6)] transition-all hover:scale-110 cursor-help`;
+                    h.title = "Essai restant";
+                    h.id = `heart-${i}`;
+                    container.appendChild(h);
+                }
+            } else {
+                const heart = document.getElementById(`heart-${lostIndex}`);
+                if (heart) {
+                    heart.classList.remove('text-rose-500', 'fa-heart', 'drop-shadow-[0_2px_10px_rgba(244,63,94,0.6)]');
+                    heart.classList.add('fa-heart-broken', 'text-slate-800', 'heart-poof', 'opacity-20');
+                }
+            }
+        }
+
+        function triggerShake(element) {
+             element.classList.remove('shake-effect');
+             void element.offsetWidth;
+             element.classList.add('shake-effect');
+             setTimeout(() => element.classList.remove('shake-effect'), 400);
+        }
+
+        function checkGuess() {
+            if (isGameOver) return;
+            const val = parseInt(guessInput.value);
+            const inputField = document.getElementById('user-guess');
+
+            // Interaction : Tremblement si invalide
+            if (isNaN(val) || val < 0 || val > MAX_NUMBER) {
+                setMessage(`Hey ! Entre 0 et 500 uniquement.`, "text-yellow-400");
+                triggerShake(inputField);
+                triggerBear('no');
+                inputField.focus();
+                return;
+            }
+
+            renderHearts(attempts);
+            attempts++;
+
+            if (val === targetNumber) {
+                gameWin();
+            } else {
+                if (attempts >= MAX_ATTEMPTS) {
+                    gameLost();
+                } else {
+                    triggerBear('down');
+                    guessInput.value = '';
+                    guessInput.focus();
+                    const isLower = val < targetNumber;
+                    setMessage(
+                        `${isLower ? 'C\'est PLUS grand !' : 'C\'est MOINS que ça !'} <br><span class="text-sm font-normal text-slate-400">Dernier essai : ${val}</span>`, 
+                        isLower ? "text-cyan-400" : "text-fuchsia-400"
+                    );
+                }
+            }
+        }
+
+        function gameWin() {
+            isGameOver = true;
+            playerData.wins++;
+            saveData();
+            triggerBear('win');
+            setMessage(`GÉNIAL ${playerData.name.toUpperCase()} !<br><span class="text-white text-sm">Le nombre était bien <span class="bg-green-500/30 px-2 rounded font-black">${targetNumber}</span> !</span>`, "text-green-400 text-2xl");
+            endGameUI();
+            startConfetti();
+        }
+
+        function gameLost() {
+            isGameOver = true;
+            playerData.losses++;
+            saveData();
+            triggerBear('no');
+            triggerShake(gameScreen); // Interaction : Tremblement de tout l'écran si perdu
+            setMessage(`Perdu... Dommage !<br><span class="text-slate-400 text-sm">C'était le nombre <span class="text-white text-2xl font-black bg-red-500/30 px-2 rounded inline-block mt-2">${targetNumber}</span></span>`, "text-red-500");
+            endGameUI();
+        }
+
+        function endGameUI() {
+            guessInput.disabled = true;
+            submitBtn.classList.add('hidden');
+            resetBtn.classList.remove('hidden');
+        }
+
+        function setMessage(html, colorClass) {
+            messageEl.style.opacity = '0';
+            messageEl.style.transform = 'translateY(10px) scale(0.9)';
+            setTimeout(() => {
+                messageEl.innerHTML = html;
+                messageEl.className = `text-xl font-black text-center ${colorClass} transition-all duration-500 ease-out`;
+                messageEl.style.opacity = '1';
+                messageEl.style.transform = 'translateY(0) scale(1)';
+            }, 150);
+        }
+
+        // --- VISUELS & ANIMATIONS ---
+        function triggerBear(type) {
+            bearCharacter.classList.remove('bear-anim-no', 'bear-anim-down', 'bear-anim-win');
+            void bearCharacter.offsetWidth; 
+            if (type === 'no') bearCharacter.classList.add('bear-anim-no');
+            else if (type === 'down') bearCharacter.classList.add('bear-anim-down');
+            else if (type === 'win') bearCharacter.classList.add('bear-anim-win');
+        }
+
+        document.addEventListener('mousemove', (e) => {
+            const glow = document.getElementById('mouse-glow');
+            // Lueur suit la souris plus fluidement
+            glow.style.transform = `translate(${e.clientX - 250}px, ${e.clientY - 250}px)`;
+            
+            const pupils = [document.getElementById('pupil-left'), document.getElementById('pupil-right')];
+            const rect = document.getElementById('bear-head').getBoundingClientRect();
+            const bx = rect.left + rect.width/2; const by = rect.top + rect.height/2;
+            const angle = Math.atan2(e.clientY - by, e.clientX - bx);
+            const dist = Math.min(3, Math.hypot(e.clientX - bx, e.clientY - by) / 35);
+            pupils.forEach(p => p.style.transform = `translate(${Math.cos(angle)*dist}px, ${Math.sin(angle)*dist}px)`);
+        });
+
+        // --- CONFETTI OPTIMISÉ ---
+        const canvas = document.getElementById('confetti-canvas');
+        const ctx = canvas.getContext('2d');
+        let animationId;
+        const resize = () => { canvas.width = window.innerWidth; canvas.height = window.innerHeight; };
+        window.addEventListener('resize', resize); resize();
+        function startConfetti() {
+            let particles = Array.from({length: 150}, () => ({
+                x: Math.random()*canvas.width, y: -50,
+                size: Math.random()*10+5, speedY: Math.random()*5+3, speedX: (Math.random()-0.5)*6,
+                color: `hsl(${Math.random()*360}, 90%, 60%)`, rot: Math.random()*360, rotSpeed: Math.random()*10-5
+            }));
+            const loop = () => {
+                ctx.clearRect(0,0,canvas.width,canvas.height);
+                particles.forEach(p => {
+                    p.y += p.speedY; p.x += p.speedX; p.rot += p.rotSpeed; p.speedY += 0.1; // gravité
+                    ctx.save(); ctx.translate(p.x, p.y); ctx.rotate(p.rot*Math.PI/180);
+                    ctx.fillStyle = p.color; ctx.fillRect(-p.size/2,-p.size/2,p.size,p.size); ctx.restore();
+                    if(p.y > canvas.height + 50) { p.y = -50; p.x = Math.random()*canvas.width; }
+                });
+                animationId = requestAnimationFrame(loop);
+            }; loop();
+        }
+        function stopConfetti() { cancelAnimationFrame(animationId); ctx.clearRect(0,0,canvas.width,canvas.height); }
+
+        // Ajout d'une touche "Entrée" pour valider
+        document.getElementById('user-guess').addEventListener('keypress', function (e) {
+            if (e.key === 'Enter') { checkGuess(); }
+        });
+        document.getElementById('user-name-input').addEventListener('keypress', function (e) {
+            if (e.key === 'Enter') { saveAndPlay(); }
+        });
+    </script>
+</body>
+                  </html><!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Devinette Élite | 0-500</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;500;700;900&display=swap');
+
+        body {
+            font-family: 'Outfit', sans-serif;
+            background-color: #0f172a;
+            color: white;
+            overflow: hidden;
+            cursor: default;
+        }
+
+        /* --- ARRIÈRE-PLAN --- */
+        .bg-animation {
+            position: fixed;
+            top: 0; left: 0; width: 100vw; height: 100vh; z-index: -1;
+            background: radial-gradient(circle at 50% 50%, #1e293b, #000000);
+            overflow: hidden;
+        }
+
+        .orb {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(80px);
+            opacity: 0.5;
+            animation: float 20s infinite ease-in-out;
+        }
+        .orb-1 { width: 500px; height: 500px; background: #4f46e5; top: -150px; left: -150px; }
+        .orb-2 { width: 400px; height: 400px; background: #d946ef; bottom: -100px; right: -100px; }
+
+        @keyframes float {
+            0%, 100% { transform: translate(0, 0) scale(1); }
+            33% { transform: translate(30px, -50px) scale(1.1); }
+            66% { transform: translate(-20px, 20px) scale(0.9); }
+        }
+
+        /* --- NOUNOURS 3D AVANCÉ --- */
+        @keyframes breathing {
+            0%, 100% { transform: translateX(-50%) translateY(0) scale(1); }
+            50% { transform: translateX(-50%) translateY(-5px) scale(1.02); }
+        }
+
+        .bear-wrapper {
+            position: absolute;
+            top: -105px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 140px;
+            height: 120px;
+            z-index: 5;
+            perspective: 1000px;
+            pointer-events: none;
+            transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            animation: breathing 4s infinite ease-in-out; /* Effet respiration */
+        }
+        
+        .bear-head {
+            width: 100px;
+            height: 90px;
+            background: radial-gradient(circle at 35% 35%, #818cf8, #4338ca);
+            border-radius: 55% 55% 45% 45% / 65% 65% 35% 35%;
+            position: absolute;
+            left: 20px;
+            top: 20px;
+            box-shadow: 
+                inset 8px 8px 15px rgba(255,255,255,0.15),
+                inset -10px -10px 20px rgba(0,0,0,0.4),
+                0 15px 30px rgba(0,0,0,0.4);
+            transition: transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
+            transform-style: preserve-3d;
+        }
+
+        .ear {
+            position: absolute;
+            width: 38px;
+            height: 38px;
+            background: radial-gradient(circle at 30% 30%, #6366f1, #312e81);
+            border-radius: 50%;
+            top: -12px;
+            z-index: -1;
+            box-shadow: inset -2px -2px 8px rgba(0,0,0,0.3);
+        }
+        .ear.left { left: -8px; transform: rotate(-15deg); }
+        .ear.right { right: -8px; transform: rotate(15deg); }
+        
+        .ear-inner {
+            position: absolute;
+            width: 22px; height: 22px;
+            background: #a5b4fc;
+            border-radius: 50%;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            opacity: 0.5;
+        }
+
+        .muzzle {
+            position: absolute;
+            bottom: 12px;
+            left: 50%;
+            transform: translateX(-50%) translateZ(15px);
+            width: 48px;
+            height: 34px;
+            background: #c7d2fe;
+            border-radius: 50%;
+            box-shadow: inset -2px -2px 10px rgba(0,0,0,0.1);
+        }
+
+        .nose {
+            position: absolute;
+            top: 6px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 16px;
+            height: 10px;
+            background: #1e1b4b;
+            border-radius: 40%;
+        }
+
+        .eye-group {
+            position: absolute;
+            top: 32px;
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            padding: 0 24px;
+            transform: translateZ(10px);
+        }
+
+        .eye {
+            width: 15px;
+            height: 18px;
+            background: #0f172a;
+            border-radius: 50%;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.5);
+        }
+        
+        .pupil {
+            width: 6px; height: 6px;
+            background: white;
+            border-radius: 50%;
+            position: absolute;
+            top: 4px; left: 4px;
+            transition: transform 0.15s ease-out;
+        }
+
+        /* Animations Personnalisées Nounours */
+        @keyframes shake-head {
+            0%, 100% { transform: rotateY(0deg); }
+            25% { transform: rotateY(-25deg); }
+            75% { transform: rotateY(25deg); }
+        }
+        @keyframes nod-down {
+            0% { transform: rotateX(0); }
+            40% { transform: rotateX(35deg) translateY(10px); }
+            100% { transform: rotateX(0); }
+        }
+        @keyframes bounce-joy {
+            0%, 100% { transform: translateY(0) scale(1); }
+            50% { transform: translateY(-30px) scale(1.05); }
+        }
+
+        .bear-anim-no .bear-head { animation: shake-head 0.5s ease-in-out; }
+        .bear-anim-down .bear-head { animation: nod-down 1s cubic-bezier(0.4, 0, 0.2, 1); }
+        .bear-anim-win .bear-head { animation: bounce-joy 0.6s infinite ease-in-out; }
+
+        /* Ombre de l'ours */
+        .bear-shadow {
+            position: absolute;
+            bottom: -5px; left: 50%;
+            transform: translateX(-50%);
+            width: 80px; height: 15px;
+            background: rgba(0,0,0,0.3);
+            filter: blur(8px);
+            border-radius: 50%;
+            z-index: -2;
+        }
+
+        /* --- UI & BOUTONS --- */
+        .glass-panel {
+            background: rgba(15, 23, 42, 0.7);
+            backdrop-filter: blur(25px);
+            -webkit-backdrop-filter: blur(25px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 25px 60px -15px rgba(0, 0, 0, 0.7);
+            transform-style: preserve-3d;
+            z-index: 10;
+        }
+
+        .btn-3d {
+            transition: all 0.1s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            box-shadow: 0 6px 0 rgb(55, 48, 163), 0 15px 25px rgba(0,0,0,0.5);
+        }
+        .btn-3d:active { transform: translateY(6px); box-shadow: 0 0px 0 rgb(55, 48, 163), 0 0px 5px rgba(0,0,0,0.4); }
+
+        .custom-input {
+            background: rgba(2, 6, 23, 0.7);
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        .custom-input:focus {
+            outline: none; border-color: #818cf8;
+            box-shadow: 0 0 30px rgba(99, 102, 241, 0.2); transform: scale(1.05);
+        }
+
+        /* Animations Vie Perdue */
+        @keyframes heart-explode {
+            0% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.8) rotate(20deg); opacity: 0.5; filter: blur(2px); }
+            100% { transform: scale(0) rotate(-45deg); opacity: 0; }
+        }
+        .heart-poof { animation: heart-explode 0.6s forwards cubic-bezier(0.4, 0, 0.2, 1); }
+        .heart-lost-static { color: #1e293b; transform: scale(0.65); opacity: 0.3; filter: grayscale(1); }
+
+        #confetti-canvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 50; }
+
+        .screen { transition: all 0.6s cubic-bezier(0.34, 1.56, 0.64, 1); position: absolute; width: 100%; max-width: 28rem; }
+        .screen-hidden { opacity: 0; pointer-events: none; transform: scale(0.8) translateY(50px) rotateX(-20deg); }
+        .screen-active { opacity: 1; pointer-events: auto; transform: scale(1) translateY(0) rotateX(0); }
+
+        #mouse-glow {
+            width: 500px; height: 500px;
+            background: radial-gradient(circle, rgba(99, 102, 241, 0.12) 0%, rgba(0,0,0,0) 70%);
+            position: fixed; border-radius: 50%; pointer-events: none; z-index: -1;
+            transform: translate(-50%, -50%);
+        }
+    </style>
+</head>
+<body class="flex items-center justify-center min-h-screen selection:bg-indigo-500 selection:text-white">
+
+    <div class="bg-animation">
+        <div class="orb orb-1"></div>
+        <div class="orb orb-2"></div>
+    </div>
+    <div id="mouse-glow"></div>
+    <canvas id="confetti-canvas"></canvas>
+
+    <div class="relative w-full max-w-md h-[600px] flex items-center justify-center">
+
+        <!-- NOUNOURS ANIMÉ -->
+        <div id="bear-character" class="bear-wrapper opacity-0">
+            <div class="bear-shadow"></div>
+            <div class="bear-head" id="bear-head">
+                <div class="ear left"><div class="ear-inner"></div></div>
+                <div class="ear right"><div class="ear-inner"></div></div>
+                <div class="eye-group">
+                    <div class="eye"><div class="pupil" id="pupil-left"></div></div>
+                    <div class="eye"><div class="pupil" id="pupil-right"></div></div>
+                </div>
+                <div class="muzzle">
+                    <div class="nose"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- LOGIN -->
+        <div id="name-screen" class="screen screen-active glass-panel p-10 rounded-[2.5rem] mx-4 text-center border-t border-white/10">
+            <div class="mb-8">
+                <div class="w-20 h-20 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-3xl mx-auto flex items-center justify-center shadow-2xl transform rotate-6 mb-6">
+                    <i class="fas fa-rocket text-4xl text-white"></i>
+                </div>
+                <h1 class="text-4xl font-black mb-2 tracking-tight">Salut !</h1>
+                <p class="text-slate-400">Quel est ton prénom ? Entre-le pour commencer à jouer.</p>
+            </div>
+            
+            <input type="text" id="user-name-input" 
+                class="custom-input w-full border border-slate-700 rounded-2xl py-5 px-6 text-2xl text-center font-bold text-white placeholder-slate-600 mb-8"
+                placeholder="Pseudo ici..." autocomplete="off">
+
+            <button onclick="startGame()" 
+                class="btn-3d w-full bg-indigo-600 hover:bg-indigo-500 text-white font-black py-5 rounded-2xl text-xl uppercase tracking-widest">
+                JOUER
+            </button>
+        </div>
+
+        <!-- JEU -->
+        <div id="game-screen" class="screen screen-hidden glass-panel p-8 rounded-[2.5rem] mx-4">
+            
+            <div class="text-center mb-6">
+                <div class="flex justify-between items-center mb-8">
+                    <div class="text-left bg-indigo-500/10 py-2 px-4 rounded-2xl border border-indigo-500/20">
+                        <span class="text-[10px] font-bold text-indigo-400 uppercase tracking-tighter">Explorateur</span>
+                        <h2 id="display-name" class="text-lg font-black text-white truncate max-w-[120px]">...</h2>
+                    </div>
+                    <div class="bg-slate-800/80 px-4 py-2 rounded-2xl border border-slate-700">
+                        <span class="text-xs text-indigo-300 font-bold tracking-widest">0 — 500</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Vies -->
+            <div class="flex justify-center gap-3 mb-10" id="lives-container"></div>
+
+            <!-- Feedback -->
+            <div id="feedback-area" class="h-24 flex flex-col items-center justify-center mb-6">
+                <p id="message" class="text-lg font-bold text-slate-300 text-center leading-snug"></p>
+            </div>
+
+            <!-- Input -->
+            <div class="relative mb-8">
+                <input type="number" id="user-guess" 
+                    class="custom-input w-full border border-slate-700 rounded-2xl py-5 px-6 text-4xl text-center font-black text-white"
+                    placeholder="???" min="0" max="500">
+            </div>
+
+            <button id="submit-btn" onclick="checkGuess()" 
+                class="btn-3d w-full bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-black py-5 rounded-2xl uppercase tracking-tighter text-xl">
+                TENTER MA CHANCE
+            </button>
+
+            <button id="reset-btn" onclick="resetGameLogic()" 
+                class="hidden btn-3d w-full bg-slate-700 text-white font-black py-5 rounded-2xl uppercase text-lg">
+                RÉESSAYER
+            </button>
+
+            <div class="mt-10 pt-6 border-t border-white/5 flex flex-col items-center">
+                <div class="text-[11px] text-slate-500 font-black uppercase tracking-[0.3em] hover:text-indigo-400 transition-colors">
+                    By kennyArp
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const MAX_ATTEMPTS = 7;
+        const MAX_NUMBER = 500;
+        let userName = "Ami";
+        let targetNumber;
+        let attempts;
+        let isGameOver;
+        
+        // Messages avec insertion du nom
+        const getLowMessages = (name) => [
+            `Vise plus haut, ${name} !`,
+            `C'est timide ça, ${name}. Monte !`,
+            `Grimpe encore un peu !`,
+            `${name}, c'est bien plus grand !`,
+            `Pas assez, ${name}. Un effort !`
+        ];
+        
+        const getHighMessages = (name) => [
+            `Oula, calme-toi ${name} ! Redescends.`,
+            `C'est beaucoup trop, ${name}.`,
+            `${name}, baisse un peu le tir !`,
+            `Tu t'enflammes ${name}, c'est moins.`,
+            `Moins fort l'ami, vise plus bas.`
+        ];
+
+        const nameScreen = document.getElementById('name-screen');
+        const gameScreen = document.getElementById('game-screen');
+        const bearCharacter = document.getElementById('bear-character');
+        const bearHead = document.getElementById('bear-head');
+        const nameInput = document.getElementById('user-name-input');
+        const displayName = document.getElementById('display-name');
+        const guessInput = document.getElementById('user-guess');
+        const messageEl = document.getElementById('message');
+        const submitBtn = document.getElementById('submit-btn');
+        const resetBtn = document.getElementById('reset-btn');
+        const livesContainer = document.getElementById('lives-container');
+
+        // Mouvement des yeux et micro-mouvements aléatoires de la tête
+        let mouseX = 0, mouseY = 0;
+        document.addEventListener('mousemove', (e) => {
+            mouseX = e.clientX; mouseY = e.clientY;
+            updateEyes(e.clientX, e.clientY);
+            
+            const glow = document.getElementById('mouse-glow');
+            glow.style.left = e.clientX + 'px';
+            glow.style.top = e.clientY + 'px';
+        });
+
+        function updateEyes(x, y) {
+            if (isGameOver) return;
+            const pupils = [document.getElementById('pupil-left'), document.getElementById('pupil-right')];
+            const rect = bearHead.getBoundingClientRect();
+            const bearX = rect.left + rect.width / 2;
+            const bearY = rect.top + rect.height / 2;
+            
+            const angle = Math.atan2(y - bearY, x - bearX);
+            const dist = Math.min(4, Math.hypot(x - bearX, y - bearY) / 30);
+            
+            const mx = Math.cos(angle) * dist;
+            const my = Math.sin(angle) * dist;
+
+            pupils.forEach(p => {
+                p.style.transform = `translate(${mx}px, ${my}px)`;
+            });
+
+            // Légère inclinaison de la tête vers la souris
+            const rotY = (x - bearX) / 40;
+            const rotX = -(y - bearY) / 40;
+            bearHead.style.transform = `rotateY(${Math.max(-15, Math.min(15, rotY))}deg) rotateX(${Math.max(-15, Math.min(15, rotX))}deg)`;
+        }
+
+        // Battement de paupières et regards aléatoires
+        setInterval(() => {
+            if (!isGameOver && Math.random() > 0.8) {
+                triggerBearReaction('blink'); // Optionnel: ajouter animation de yeux fermés
+            }
+        }, 3000);
+
+        function startGame() {
+            const val = nameInput.value.trim();
+            if (val) userName = val;
+            
+            nameScreen.classList.remove('screen-active');
+            nameScreen.classList.add('screen-hidden');
+            
+            setTimeout(() => {
+                gameScreen.classList.remove('screen-hidden');
+                gameScreen.classList.add('screen-active');
+                bearCharacter.classList.remove('opacity-0');
+                displayName.innerText = userName;
+                resetGameLogic();
+            }, 400);
+        }
+
+        function resetGameLogic() {
+            targetNumber = Math.floor(Math.random() * 501);
+            attempts = 0;
+            isGameOver = false;
+            guessInput.value = '';
+            guessInput.disabled = false;
+            guessInput.focus();
+            
+            messageEl.innerHTML = `Alors <span class="text-indigo-400">${userName}</span>,<br>on tente quel nombre ?`;
+            messageEl.className = "text-xl font-bold text-slate-300 text-center";
+            
+            submitBtn.classList.remove('hidden');
+            resetBtn.classList.add('hidden');
+            bearCharacter.classList.remove('bear-anim-no', 'bear-anim-down', 'bear-anim-win');
+            
+            renderHearts();
+            stopConfetti();
+        }
+
+        function renderHearts(lostIndex = -1) {
+            if (lostIndex === -1) {
+                livesContainer.innerHTML = '';
+                for (let i = 0; i < MAX_ATTEMPTS; i++) {
+                    const h = document.createElement('i');
+                    h.className = `fas fa-heart text-xl text-rose-500 drop-shadow-[0_0_8px_rgba(244,63,94,0.5)]`;
+                    h.id = `heart-${i}`;
+                    livesContainer.appendChild(h);
+                }
+            } else {
+                const heart = document.getElementById(`heart-${lostIndex}`);
+                if (heart) {
+                    heart.classList.add('heart-poof');
+                    setTimeout(() => {
+                        heart.classList.remove('heart-poof', 'text-rose-500');
+                        heart.classList.add('heart-lost-static');
+                    }, 550);
+                }
+            }
+        }
+
+        function triggerBearReaction(type) {
+            bearCharacter.classList.remove('bear-anim-no', 'bear-anim-down', 'bear-anim-win');
+            void bearCharacter.offsetWidth;
+            if (type === 'no') bearCharacter.classList.add('bear-anim-no');
+            else if (type === 'down') bearCharacter.classList.add('bear-anim-down');
+            else if (type === 'win') bearCharacter.classList.add('bear-anim-win');
+        }
+
+        function checkGuess() {
+            if (isGameOver) return;
+            const val = parseInt(guessInput.value);
+
+            if (isNaN(val) || val < 0 || val > MAX_NUMBER) {
+                setMessage(`Attention ${userName}, entre 0 et 500 !`, "text-yellow-400");
+                triggerBearReaction('no');
+                return;
+            }
+
+            renderHearts(attempts);
+            attempts++;
+
+            if (val === targetNumber) {
+                gameWin();
+            } else {
+                if (attempts >= MAX_ATTEMPTS) {
+                    gameLost();
+                } else {
+                    triggerBearReaction('down');
+                    guessInput.value = '';
+                    guessInput.focus();
+                    
+                    const msgList = val < targetNumber ? getLowMessages(userName) : getHighMessages(userName);
+                    const randMsg = msgList[Math.floor(Math.random() * msgList.length)];
+                    const color = val < targetNumber ? "text-cyan-400" : "text-fuchsia-400";
+                    
+                    setMessage(`${randMsg}<br><span class="text-xs opacity-60 font-normal uppercase mt-1 block">C'est ${val < targetNumber ? 'plus' : 'moins'} que ${val}</span>`, color);
+                }
+            }
+        }
+
+        function setMessage(html, color) {
+            messageEl.style.opacity = '0';
+            messageEl.style.transform = 'translateY(10px)';
+            setTimeout(() => {
+                messageEl.innerHTML = html;
+                messageEl.className = `text-xl font-black text-center ${color} transition-all duration-300`;
+                messageEl.style.opacity = '1';
+                messageEl.style.transform = 'translateY(0)';
+            }, 200);
+        }
+
+        function gameWin() {
+            isGameOver = true;
+            triggerBearReaction('win');
+            setMessage(`GÉNIAL ${userName.toUpperCase()} !<br><span class="text-sm text-white font-medium mt-2 block">Tu as trouvé le ${targetNumber} !</span>`, "text-green-400 text-2xl");
+            guessInput.disabled = true;
+            submitBtn.classList.add('hidden');
+            resetBtn.classList.remove('hidden');
+            startConfetti();
+        }
+
+        function gameLost() {
+            isGameOver = true;
+            triggerBearReaction('no');
+            setMessage(`Mince, c'est fini ${userName}...<br><span class="text-white mt-2 block text-sm">Le trésor était en <span class="text-3xl text-red-500 font-black inline-block ml-1">${targetNumber}</span></span>`, "text-red-500");
+            guessInput.disabled = true;
+            submitBtn.classList.add('hidden');
+            resetBtn.classList.remove('hidden');
+        }
+
+        // --- CONFETTI ENGINE ---
+        const canvas = document.getElementById('confetti-canvas');
+        const ctx = canvas.getContext('2d');
+        let animationId, particles = [];
+        const resize = () => { canvas.width = window.innerWidth; canvas.height = window.innerHeight; };
+        window.addEventListener('resize', resize); resize();
+
+        class Particle {
+            constructor() {
+                this.x = Math.random() * canvas.width;
+                this.y = -20;
+                this.size = Math.random() * 8 + 4;
+                this.speedY = Math.random() * 5 + 3;
+                this.speedX = (Math.random() - 0.5) * 6;
+                this.color = `hsl(${Math.random() * 360}, 80%, 60%)`;
+                this.rot = Math.random() * 360;
+            }
+            update() { this.y += this.speedY; this.x += this.speedX; this.rot += 5; }
+            draw() {
+                ctx.save();
+                ctx.translate(this.x, this.y);
+                ctx.rotate(this.rot * Math.PI / 180);
+                ctx.fillStyle = this.color;
+                ctx.fillRect(-this.size/2, -this.size/2, this.size, this.size);
+                ctx.restore();
+            }
+        }
+
+        function startConfetti() {
+            particles = Array.from({length: 150}, () => new Particle());
+            const loop = () => {
+                ctx.clearRect(0,0,canvas.width,canvas.height);
+                particles.forEach(p => { p.update(); p.draw(); });
+                animationId = requestAnimationFrame(loop);
+            }; loop();
+        }
+        function stopConfetti() { cancelAnimationFrame(animationId); ctx.clearRect(0,0,canvas.width,canvas.height); }
+    </script>
+</body>
+                  </html>
